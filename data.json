@@ -1,0 +1,13 @@
+{
+  "updatedAt": "2026-06-21T12:00:00.000Z",
+  "market": {
+    "score": 2,
+    "direction": "bull",
+    "btc": { "align": "정배열", "rsi": 58.4, "ema_score": 1, "rsi_score": 1 },
+    "breadth": { "long": 61, "short": 39, "total": 100, "score": 1 }
+  },
+  "symbols": [
+    { "symbol": "BTCUSDT", "price": 64210.5, "change24h": 1.83, "rsi": 58.4, "ema7": 64050, "ema24": 63950, "ema60": 62100, "align": "정배열", "vsEma24": 0.41, "isStock": false },
+    { "symbol": "ETHUSDT", "price": 3412.2, "change24h": 2.71, "rsi": 62.1, "ema7": 3400, "ema24": 3380, "ema60": 3300, "align": "정배열", "vsEma24": 0.95, "isStock": false }
+  ]
+}

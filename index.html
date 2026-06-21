@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Watch — Cloud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#282a36; --bg2:#21222c; --bg3:#1b1c24;
+    --line:#44475a; --line2:#343746;
+    --fg:#f8f8f2; --muted:#6272a4;
+    --cyan:#8be9fd; --green:#50fa7b; --orange:#ffb86c;
+    --pink:#ff79c6; --purple:#bd93f9; --red:#ff5555; --yellow:#f1fa8c;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);color:var(--fg);
+    font-family:"JetBrains Mono",ui-monospace,monospace;
+    font-size:13px;line-height:1.45;
+    padding:12px;padding-bottom:60px;
+  }
+  a{color:var(--cyan)}
+
+  /* ---- header ---- */
+  header{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  .logo{font-weight:800;font-size:15px;letter-spacing:.5px}
+  .logo .dot{color:var(--green)}
+  .freshness{
+    margin-left:auto;display:flex;align-items:center;gap:6px;
+    font-size:11px;color:var(--muted);
+  }
+  .pill{
+    padding:3px 8px;border-radius:999px;border:1px solid var(--line);
+    font-size:11px;font-weight:500;white-space:nowrap;
+  }
+  .pill.ok{color:var(--green);border-color:#2c5a3a;background:#1e3326}
+  .pill.stale{color:var(--orange);border-color:#5a4424;background:#33291a}
+  .pill.demo{color:var(--purple);border-color:#43356b;background:#2a2342}
+  .pill.err{color:var(--red);border-color:#5a2c2c;background:#331e1e}
+
+  /* ---- market score panel ---- */
+  .market{
+    background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);
+    padding:12px;margin-bottom:10px;
+    display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;
+  }
+  .score-badge{
+    width:84px;height:84px;border-radius:14px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:2px solid var(--line);
+  }
+  .score-badge.bull{border-color:var(--green);background:#16301f;color:var(--green)}
+  .score-badge.bear{border-color:var(--red);background:#311a1a;color:var(--red)}
+  .score-badge.neutral{border-color:var(--muted);background:var(--bg3);color:var(--muted)}
+  .score-badge .num{font-size:30px;font-weight:800;line-height:1}
+  .score-badge .lbl{font-size:10px;margin-top:4px;letter-spacing:1px}
+  .market-meta{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .market-row{display:flex;gap:8px;flex-wrap:wrap;font-size:11px}
+  .chip{padding:2px 8px;border-radius:6px;background:var(--bg3);border:1px solid var(--line2);color:var(--muted)}
+  .chip b{color:var(--fg);font-weight:700}
+  .chip .up{color:var(--green)} .chip .down{color:var(--red)}
+  .breadth-bar{height:8px;border-radius:4px;overflow:hidden;display:flex;background:var(--bg3);border:1px solid var(--line2)}
+  .breadth-bar .l{background:var(--green)} .breadth-bar .s{background:var(--red)}
+
+  /* ---- controls ---- */
+  details.panel{
+    background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);
+    margin-bottom:10px;overflow:hidden;
+  }
+  details.panel>summary{
+    list-style:none;cursor:pointer;padding:10px 12px;
+    font-weight:700;font-size:12px;color:var(--cyan);
+    display:flex;align-items:center;gap:8px;user-select:none;
+  }
+  details.panel>summary::-webkit-details-marker{display:none}
+  details.panel>summary::before{content:"▸";color:var(--muted);transition:.15s}
+  details.panel[open]>summary::before{transform:rotate(90deg)}
+  .panel-body{padding:0 12px 12px;display:flex;flex-wrap:wrap;gap:14px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:10px;color:var(--muted);letter-spacing:.5px}
+  .field input[type=number],.field input[type=text]{
+    background:var(--bg3);border:1px solid var(--line);border-radius:6px;
+    color:var(--fg);font-family:inherit;font-size:13px;padding:6px 8px;width:90px;
+  }
+  .field input[type=text]{width:140px}
+  .field input:focus{outline:none;border-color:var(--purple)}
+  .toggle{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;align-self:flex-end;padding-bottom:6px}
+  .toggle input{accent-color:var(--purple);width:16px;height:16px}
+
+  /* ---- table ---- */
+  .table-wrap{
+    background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);
+    overflow:auto;-webkit-overflow-scrolling:touch;
+  }
+  table{border-collapse:collapse;width:100%;font-size:12px}
+  thead th{
+    position:sticky;top:0;z-index:2;background:var(--bg3);
+    color:var(--muted);font-weight:700;text-align:right;
+    padding:9px 10px;white-space:nowrap;cursor:pointer;user-select:none;
+    border-bottom:1px solid var(--line);
+  }
+  thead th:first-child,tbody td:first-child{text-align:left;position:sticky;left:0;background:var(--bg3);z-index:1}
+  tbody td:first-child{background:var(--bg2)}
+  thead th .arrow{color:var(--purple);font-size:10px;margin-left:3px}
+  thead th .ord{color:var(--muted);font-size:9px}
+  tbody td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line2);white-space:nowrap}
+  tbody tr:hover td{background:#2f3142}
+  tbody tr:hover td:first-child{background:#2f3142}
+  .sym{font-weight:700;color:var(--fg)}
+  .sym .base{color:var(--muted);font-weight:400}
+  .up{color:var(--green)} .down{color:var(--red)}
+  .rsi-hi{color:var(--red)} .rsi-lo{color:var(--cyan)}
+  .align-up{color:var(--green)} .align-down{color:var(--red)} .align-mix{color:var(--muted)}
+  .near{color:var(--bg);background:var(--yellow);font-weight:700;border-radius:5px;padding:2px 6px}
+  .stock-tag{font-size:9px;color:var(--orange);border:1px solid #5a4424;border-radius:4px;padding:1px 4px;margin-left:5px}
+  .empty{padding:30px;text-align:center;color:var(--muted)}
+
+  footer{margin-top:10px;font-size:10px;color:var(--muted);text-align:center}
+
+  @media(max-width:520px){
+    body{font-size:12px}
+    .market{grid-template-columns:1fr}
+    .score-badge{width:100%;height:64px;flex-direction:row;gap:10px}
+    .score-badge .num{font-size:26px}
+    .field input[type=number]{width:72px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">market<span class="dot">·</span>watch</div>
+  <div class="freshness">
+    <span id="updated">—</span>
+    <span class="pill" id="status">로딩중</span>
+  </div>
+</header>
+
+<div class="market" id="market"></div>
+
+<details class="panel" id="filterPanel">
+  <summary>필터 / 정렬</summary>
+  <div class="panel-body">
+    <div class="field">
+      <label>심볼 검색</label>
+      <input type="text" id="fSearch" placeholder="BTC, ETH…" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>RSI 최소</label>
+      <input type="number" id="fRsiMin" min="0" max="100" step="1" placeholder="0">
+    </div>
+    <div class="field">
+      <label>RSI 최대</label>
+      <input type="number" id="fRsiMax" min="0" max="100" step="1" placeholder="100">
+    </div>
+    <div class="field">
+      <label>EMA24 근접 ±%</label>
+      <input type="number" id="fNear" min="0" max="10" step="0.1" value="0.5">
+    </div>
+    <label class="toggle"><input type="checkbox" id="fStocks"> 주식심볼 제외</label>
+    <label class="toggle"><input type="checkbox" id="fNearOnly"> 근접만 보기</label>
+  </div>
+</details>
+
+<div class="table-wrap">
+  <table id="tbl">
+    <thead><tr id="head"></tr></thead>
+    <tbody id="body"></tbody>
+  </table>
+</div>
+
+<footer id="foot"></footer>
+
+<script>
+"use strict";
+
+/* ────────────────────────────────────────────────────────────
+   데모용 폴백 데이터 — Pages에 올리면 ./data.json 을 읽고,
+   읽기 실패 시(미리보기/로컬) 아래 샘플로 렌더된다.
+   ──────────────────────────────────────────────────────────── */
+const SAMPLE_DATA = {
+  updatedAt: new Date().toISOString(),
+  demo: true,
+  market: {
+    score: 2, direction: "bull",
+    btc: { align: "정배열", rsi: 58.4, ema_score: 1, rsi_score: 1 },
+    breadth: { long: 61, short: 39, total: 100, score: 1 }
+  },
+  symbols: [
+    {symbol:"BTCUSDT",price:64210.5,change24h:1.83,rsi:58.4,ema7:64050,ema24:63950,ema60:62100,align:"정배열",vsEma24:0.41,isStock:false},
+    {symbol:"ETHUSDT",price:3412.2,change24h:2.71,rsi:62.1,ema7:3400,ema24:3380,ema60:3300,align:"정배열",vsEma24:0.95,isStock:false},
+    {symbol:"SOLUSDT",price:148.9,change24h:-1.2,rsi:47.3,ema7:150,ema24:151,ema60:155,align:"역배열",vsEma24:-1.39,isStock:false},
+    {symbol:"SYNUSDT",price:0.842,change24h:11.4,rsi:74.8,ema7:0.81,ema24:0.78,ema60:0.74,align:"정배열",vsEma24:7.95,isStock:false},
+    {symbol:"BELUSDT",price:0.612,change24h:8.9,rsi:71.2,ema7:0.60,ema24:0.585,ema60:0.56,align:"정배열",vsEma24:4.62,isStock:false},
+    {symbol:"LTCUSDT",price:84.3,change24h:0.12,rsi:51.0,ema7:84.2,ema24:84.5,ema60:85.1,align:"혼조",vsEma24:-0.24,isStock:false},
+    {symbol:"AGTUSDT",price:1.204,change24h:-6.3,rsi:31.5,ema7:1.25,ema24:1.30,ema60:1.38,align:"역배열",vsEma24:-7.38,isStock:false},
+    {symbol:"COINUSDT",price:212.4,change24h:1.05,rsi:55.2,ema7:211,ema24:210,ema60:205,align:"정배열",vsEma24:1.14,isStock:true},
+  ]
+};
+
+/* ── 컬럼 정의 ── */
+const COLS = [
+  {key:"symbol",  label:"심볼",   type:"sym"},
+  {key:"price",   label:"가격",   type:"num"},
+  {key:"change24h",label:"24h%",  type:"pct"},
+  {key:"rsi",     label:"RSI",    type:"rsi"},
+  {key:"align",   label:"배열",   type:"align"},
+  {key:"vsEma24", label:"vs EMA24", type:"near"},
+];
+
+/* ── 상태 (localStorage 영속) ── */
+const LS_KEY = "mw_cloud_state_v1";
+const defaultState = {
+  sort:[{key:"vsEma24",dir:1}],
+  search:"", rsiMin:null, rsiMax:null, near:0.5,
+  hideStocks:false, nearOnly:false, panelOpen:false
+};
+let state = loadState();
+let DATA = null;
+
+function loadState(){
+  try{ const s=JSON.parse(localStorage.getItem(LS_KEY)); return Object.assign({},defaultState,s||{}); }
+  catch(e){ return Object.assign({},defaultState); }
+}
+function saveState(){ try{ localStorage.setItem(LS_KEY,JSON.stringify(state)); }catch(e){} }
+
+/* ── 포맷터 ── */
+const fmtPrice = v => v>=1000? v.toLocaleString("en-US",{maximumFractionDigits:1})
+                    : v>=1 ? v.toFixed(3) : v.toPrecision(4);
+const fmtPct = v => (v>0?"+":"")+v.toFixed(2)+"%";
+const fmtNear = v => (v>0?"+":"")+v.toFixed(2)+"%";
+
+/* ── 데이터 로드 ── */
+async function load(){
+  try{
+    const res = await fetch("./data.json?t="+Date.now(),{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    DATA = await res.json();
+    DATA.demo = false;
+    setStatus("ok");
+  }catch(e){
+    DATA = SAMPLE_DATA;
+    setStatus("demo");
+  }
+  render();
+}
+
+function setStatus(kind){
+  const el=document.getElementById("status");
+  const upd=document.getElementById("updated");
+  const ts = DATA && DATA.updatedAt ? new Date(DATA.updatedAt) : null;
+  if(ts){
+    const ageMin = (Date.now()-ts.getTime())/60000;
+    upd.textContent = ts.toLocaleString("ko-KR",{hour:"2-digit",minute:"2-digit",month:"numeric",day:"numeric"});
+    if(kind==="ok" && ageMin>25){ el.className="pill stale"; el.textContent="데이터 지연 "+Math.round(ageMin)+"분"; return; }
+  } else { upd.textContent="—"; }
+  if(kind==="ok"){ el.className="pill ok"; el.textContent="실시간"; }
+  else if(kind==="demo"){ el.className="pill demo"; el.textContent="데모 데이터"; }
+  else { el.className="pill err"; el.textContent="로드 실패"; }
+}
+
+/* ── 마켓 스코어 패널 ── */
+function renderMarket(){
+  const m = DATA.market||{};
+  const dir = m.direction||"neutral";
+  const dirLabel = dir==="bull"?"롱 알림":dir==="bear"?"숏 알림":"중립 (무음)";
+  const score = (m.score>0?"+":"")+ (m.score??0);
+  const btc=m.btc||{}, br=m.breadth||{};
+  const lpct = br.total? Math.round(br.long/br.total*100):50;
+  const el=document.getElementById("market");
+  el.innerHTML = `
+    <div class="score-badge ${dir}">
+      <div class="num">${score}</div>
+      <div class="lbl">${dir.toUpperCase()}</div>
+    </div>
+    <div class="market-meta">
+      <div class="market-row">
+        <span class="chip">방향 <b>${dirLabel}</b></span>
+        <span class="chip">BTC <b>${btc.align||"—"}</b> · RSI <b>${btc.rsi!=null?btc.rsi.toFixed(1):"—"}</b></span>
+      </div>
+      <div class="market-row">
+        <span class="chip">정배열 <b class="up">${br.long??"—"}</b> / 역배열 <b class="down">${br.short??"—"}</b> (${br.total??"—"})</span>
+      </div>
+      <div class="breadth-bar"><div class="l" style="width:${lpct}%"></div><div class="s" style="width:${100-lpct}%"></div></div>
+    </div>`;
+}
+
+/* ── 정렬 ── */
+function applySort(rows){
+  const s=state.sort;
+  return rows.sort((a,b)=>{
+    for(const {key,dir} of s){
+      let av=a[key], bv=b[key];
+      if(typeof av==="string"){ av=av||""; bv=bv||""; const c=av.localeCompare(bv); if(c) return c*dir; }
+      else { av=av??-Infinity; bv=bv??-Infinity; if(av<bv) return -dir; if(av>bv) return dir; }
+    }
+    return 0;
+  });
+}
+function toggleSort(key, additive){
+  const i = state.sort.findIndex(s=>s.key===key);
+  if(additive){
+    if(i>=0) state.sort[i].dir*=-1; else state.sort.push({key,dir:-1});
+  }else{
+    if(i===0) state.sort[0].dir*=-1; else state.sort=[{key,dir:-1}];
+  }
+  saveState(); render();
+}
+
+/* ── 필터 ── */
+function applyFilter(rows){
+  const q=(state.search||"").trim().toUpperCase();
+  return rows.filter(r=>{
+    if(state.hideStocks && r.isStock) return false;
+    if(q && !r.symbol.toUpperCase().includes(q)) return false;
+    if(state.rsiMin!=null && r.rsi<state.rsiMin) return false;
+    if(state.rsiMax!=null && r.rsi>state.rsiMax) return false;
+    if(state.nearOnly && Math.abs(r.vsEma24)>state.near) return false;
+    return true;
+  });
+}
+
+/* ── 렌더 ── */
+function render(){
+  if(!DATA) return;
+  renderMarket();
+
+  // header
+  const head=document.getElementById("head");
+  head.innerHTML = COLS.map(c=>{
+    const si=state.sort.findIndex(s=>s.key===c.key);
+    let arrow="", ord="";
+    if(si>=0){ arrow=`<span class="arrow">${state.sort[si].dir>0?"▲":"▼"}</span>`; if(state.sort.length>1) ord=`<span class="ord">${si+1}</span>`; }
+    return `<th data-key="${c.key}">${c.label}${arrow}${ord}</th>`;
+  }).join("");
+  head.querySelectorAll("th").forEach(th=>{
+    th.onclick=(e)=>toggleSort(th.dataset.key, e.shiftKey);
+  });
+
+  // rows
+  let rows = applyFilter((DATA.symbols||[]).slice());
+  rows = applySort(rows);
+
+  const body=document.getElementById("body");
+  if(!rows.length){ body.innerHTML=`<tr><td class="empty" colspan="${COLS.length}">조건에 맞는 심볼이 없습니다</td></tr>`; }
+  else{
+    body.innerHTML = rows.map(r=>`<tr>${COLS.map(c=>cell(r,c)).join("")}</tr>`).join("");
+  }
+
+  document.getElementById("foot").textContent =
+    `${rows.length} / ${(DATA.symbols||[]).length} 심볼 · ${DATA.demo?"데모":"data.json"} · 2분마다 자동 갱신`;
+}
+
+function cell(r,c){
+  const v=r[c.key];
+  switch(c.type){
+    case "sym":{
+      const base=r.symbol.replace(/USDT$/,"");
+      const tag=r.isStock?`<span class="stock-tag">주식</span>`:"";
+      return `<td><span class="sym">${base}<span class="base">USDT</span></span>${tag}</td>`;
+    }
+    case "num": return `<td>${fmtPrice(v)}</td>`;
+    case "pct": return `<td class="${v>=0?"up":"down"}">${fmtPct(v)}</td>`;
+    case "rsi":{
+      const cl=v>=70?"rsi-hi":v<=30?"rsi-lo":"";
+      return `<td class="${cl}">${v!=null?v.toFixed(1):"—"}</td>`;
+    }
+    case "align":{
+      const cl=v==="정배열"?"align-up":v==="역배열"?"align-down":"align-mix";
+      return `<td class="${cl}">${v||"—"}</td>`;
+    }
+    case "near":{
+      const near=Math.abs(v)<=state.near;
+      return `<td>${near?`<span class="near">${fmtNear(v)}</span>`:fmtNear(v)}</td>`;
+    }
+    default: return `<td>${v??"—"}</td>`;
+  }
+}
+
+/* ── 컨트롤 바인딩 ── */
+function bind(){
+  const p=document.getElementById("filterPanel");
+  p.open=state.panelOpen;
+  p.addEventListener("toggle",()=>{state.panelOpen=p.open;saveState();});
+
+  const map={fSearch:"search",fRsiMin:"rsiMin",fRsiMax:"rsiMax",fNear:"near",fStocks:"hideStocks",fNearOnly:"nearOnly"};
+  for(const [id,key] of Object.entries(map)){
+    const el=document.getElementById(id);
+    if(el.type==="checkbox"){ el.checked=!!state[key]; }
+    else { el.value = state[key]!=null? state[key] : ""; }
+    el.addEventListener("input",()=>{
+      if(el.type==="checkbox") state[key]=el.checked;
+      else if(el.type==="number") state[key]= el.value===""? (key==="near"?0.5:null) : parseFloat(el.value);
+      else state[key]=el.value;
+      saveState(); render();
+    });
+  }
+}
+
+bind();
+load();
+setInterval(load, 120000); // 2분마다 data.json 재요청
+</script>
+</body>
+</html>
