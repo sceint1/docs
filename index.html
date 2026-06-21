@@ -79,6 +79,8 @@
   .ratio-bar{height:7px;border-radius:4px;overflow:hidden;display:flex;background:var(--bg3);border:1px solid var(--line2);margin-bottom:8px}
   .ratio-bar .a{background:var(--orange)}
   .chart-note{font-size:10px;color:var(--muted);text-align:center;padding:14px}
+  .trend-chart{margin:2px 0;background:var(--bg3);border:1px solid var(--line2);border-radius:8px;padding:6px 4px 0}
+  .seg.sm button{padding:2px 6px;font-size:9px}
   .legend{display:flex;gap:12px;font-size:10px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
   .legend span{display:inline-flex;align-items:center;gap:4px}
   .legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
@@ -175,7 +177,8 @@ const SAMPLE_DATA = {
   market: { score: 2, direction: "bull", btc:{align:"정배열",rsi:58.4}, breadth:{long:61,short:39,total:100,score:1} },
   btc: { price:64210.5, change24h:0.93, rsi:49.0, emaState:"혼합", priceState:"혼합", volState:"활발", verdict:"약한 강세",
          ma50:{side:"아래",pct:-11.3}, ma200:{side:"아래",pct:-16.6} },
-  trend: { total:100, bull:57, bear:21, weakBull:84, rsiL3:97, rsiL5:88, rsiL8:75, up7d:{up:62,total:100} },
+  trend: { total:100, bull:57, bear:21, weakBull:84, rsiL3:97, rsiL5:88, rsiL8:75, up7d:{up:62,total:100},
+           series:(()=>{const a=[];for(let i=0;i<168;i++){a.push({bull:50+Math.round(Math.sin(i/12)*9+Math.sin(i/40)*6),weak:78+Math.round(Math.cos(i/15)*8),rsiL:80+Math.round(Math.sin(i/6)*15),total:100});}return a;})() },
   moneyflow: { ethbtc:{value:0.026920,change24h:-0.69,chart24h:[0.02713,0.02710,0.02707,0.02705,0.02709,0.02712,0.02708,0.02701,0.02698,0.02702,0.02699,0.02695,0.02697,0.02694,0.02696,0.02699,0.02697,0.02692,0.02689,0.02688,0.02690,0.02691,0.02692,0.02692]},
                usdtd:{value:8.2,change24h:-0.01} },
   history: (()=>{const a=[];const now=Date.now();for(let i=72;i>=0;i--){a.push({t:now-i*20*60e3,usdtd:8.2+Math.sin(i/9)*0.05,bull:55+Math.round(Math.sin(i/7)*6),weakBull:82+Math.round(Math.cos(i/8)*5),rsiL3:90+Math.round(Math.sin(i/5)*8)});}return a;})(),
@@ -196,7 +199,7 @@ const COLS = [
 ];
 
 const LS_KEY="mw_cloud_state_v2";
-const defaultState={sort:[{key:"vsEma24",dir:1}],search:"",rsiMin:null,rsiMax:null,near:0.5,nearOnly:false,panelOpen:false,rsiWin:3};
+const defaultState={sort:[{key:"vsEma24",dir:1}],search:"",rsiMin:null,rsiMax:null,near:0.5,nearOnly:false,panelOpen:false,rsiWin:3,trendWin:24};
 let state=loadState(); let DATA=null;
 function loadState(){try{const s=JSON.parse(localStorage.getItem(LS_KEY));return Object.assign({},defaultState,s||{});}catch(e){return Object.assign({},defaultState);}}
 function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}}
@@ -300,45 +303,50 @@ function renderMoneyflow(){
     <div class="legend"><span>ETH/BTC ↑ 알트로 자금</span><span>USDT.D ↑ 현금화(약세 신호)</span></div>`;
 }
 
-/* ── ② 추세 지표 ── */
+/* ── ② 추세 지표 (그래프 중심) ── */
+function svgTrend(series,win){
+  if(!Array.isArray(series)||series.length<2) return `<div class="chart-note">추이 데이터가 아직 없습니다 (스캐너 실행 후 표시)</div>`;
+  const data=series.slice(-win), n=data.length;
+  const total=Math.max(...data.map(p=>p.total||0),1);
+  const w=480,h=150,pl=2,pr=2,pt=6,pb=14,iw=w-pl-pr,ih=h-pt-pb;
+  const X=i=>pl+(n>1?(i/(n-1))*iw:0), Y=v=>pt+ih-(v/total)*ih;
+  let grid="";[0.25,0.5,0.75].forEach(f=>{const y=(pt+ih-f*ih).toFixed(1);grid+=`<line x1="${pl}" y1="${y}" x2="${w-pr}" y2="${y}" stroke="#343746" stroke-width="1" stroke-dasharray="2 5"/>`;});
+  const lines=[{k:"rsiL",c:"#ffb86c"},{k:"weak",c:"#8be9fd"},{k:"bull",c:"#50fa7b"}];
+  let paths="";for(const ln of lines){let d="";data.forEach((p,i)=>{const v=p[ln.k];if(typeof v==="number")d+=(d?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)+" ";});paths+=`<path d="${d}" fill="none" stroke="${ln.c}" stroke-width="1.8"/>`;}
+  const lbl=win<=24?"24시간 전":win<=72?"3일 전":"7일 전";
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block" preserveAspectRatio="none">${grid}${paths}
+    <text x="${pl+2}" y="${h-3}" fill="#6272a4" font-size="9">${lbl}</text>
+    <text x="${w-pr-2}" y="${h-3}" fill="#6272a4" font-size="9" text-anchor="end">현재</text></svg>`;
+}
 function renderTrend(){
   const el=document.getElementById("trendCard");
   const t=DATA.trend; if(!t){el.style.display="none";return;} el.style.display="";
-  const win=state.rsiWin||3;
-  const rsiL=win===5?t.rsiL5:win===8?t.rsiL8:t.rsiL3;
+  const win=state.rsiWin||3, rsiL=win===5?t.rsiL5:win===8?t.rsiL8:t.rsiL3;
   const tot=t.total||100;
   const bullPct=Math.round((t.bull/tot)*100),bearPct=Math.round((t.bear/tot)*100);
   const up7=t.up7d||{up:0,total:0};
-  // 추이 차트 (히스토리)
-  const hist=recentHistory(24);
-  const series=[
-    {name:"RSI-L",color:"#ffb86c",values:hist.map(x=>x.rsiL3)},
-    {name:"약정배",color:"#8be9fd",values:hist.map(x=>x.weakBull)},
-    {name:"정배열",color:"#50fa7b",values:hist.map(x=>x.bull)},
-  ];
+  const tw=state.trendWin||24;
   el.innerHTML=`
     <div class="card-title">② 추세 지표 — 상위 ${tot} 종목 (1H)
-      <span class="seg" id="rsiSeg">
-        <button data-w="3" class="${win===3?'on':''}">3H</button>
-        <button data-w="5" class="${win===5?'on':''}">5H</button>
-        <button data-w="8" class="${win===8?'on':''}">8H</button>
-      </span></div>
+      <span class="seg" id="twSeg"><button data-w="24" class="${tw===24?'on':''}">24H</button><button data-w="168" class="${tw===168?'on':''}">7D</button></span></div>
+    <div class="trend-chart">${svgTrend(t.series,tw)}</div>
+    <div class="legend" style="justify-content:center;margin:4px 0 12px">
+      <span><i style="background:#ffb86c"></i>RSI-L (상승)</span>
+      <span><i style="background:#8be9fd"></i>약정배</span>
+      <span><i style="background:#50fa7b"></i>정배열(강)</span></div>
     <div class="tr-stats">
       <div class="tr-stat rsil"><div class="n">${rsiL}</div><div class="k">RSI-L (상승)</div></div>
       <div class="tr-stat weak"><div class="n">${t.weakBull}</div><div class="k">약정배</div></div>
       <div class="tr-stat bull"><div class="n">${t.bull}</div><div class="k">정배열(강)</div></div>
       <div class="tr-stat bear"><div class="n">${t.bear}</div><div class="k">역배열</div></div>
     </div>
-    <div class="tr-sub"><span>정배열 <b class="up">${bullPct}%</b></span><span>역배열 <b class="down">${bearPct}%</b></span>
-      <span>RSI 상승 종목 (${win}H 기울기)</span></div>
-    <div class="ratio-bar"><div class="a" style="width:${Math.round((rsiL/tot)*100)}%"></div></div>
-    <div class="tr-sub"><span>📈 7일 상승 비율 <b>${up7.up} / ${up7.total}</b></span>
-      <span>(${up7.total?Math.round(up7.up/up7.total*100):0}%)</span></div>
-    <div style="margin-top:8px">${svgMulti(series)}</div>
-    <div class="legend">
-      <span><i style="background:#ffb86c"></i>RSI-L</span>
-      <span><i style="background:#8be9fd"></i>약정배</span>
-      <span><i style="background:#50fa7b"></i>정배열</span></div>`;
+    <div class="tr-sub">
+      <span>RSI-L 기울기</span>
+      <span class="seg sm" id="rsiSeg"><button data-w="3" class="${win===3?'on':''}">3H</button><button data-w="5" class="${win===5?'on':''}">5H</button><button data-w="8" class="${win===8?'on':''}">8H</button></span>
+      <span style="margin-left:auto">📈 7일 상승 <b>${up7.up}/${up7.total}</b> (${up7.total?Math.round(up7.up/up7.total*100):0}%)</span>
+    </div>`;
+  const tws=document.getElementById("twSeg");
+  if(tws) tws.querySelectorAll("button").forEach(b=>b.onclick=()=>{state.trendWin=+b.dataset.w;saveState();renderTrend();});
   const seg=document.getElementById("rsiSeg");
   if(seg) seg.querySelectorAll("button").forEach(b=>b.onclick=()=>{state.rsiWin=+b.dataset.w;saveState();renderTrend();});
 }
