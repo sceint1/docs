@@ -59,8 +59,9 @@
   .mf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .mf-box{border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--bg3)}
   .mf-box.cyan{border-color:#2f6478}.mf-box.green{border-color:#2c5a3a}
-  .mf-name{font-size:15px;color:var(--muted)}
-  .mf-sub{font-size:14px;color:var(--muted);margin-bottom:4px}
+  .mf-head{display:flex;align-items:baseline;gap:7px;margin-bottom:2px}
+  .mf-name{font-size:15px;color:var(--fg);font-weight:700}
+  .mf-sub{font-size:13px;color:var(--muted)}
   .mf-val{font-size:33px;font-weight:800;letter-spacing:.5px}
   .mf-box.cyan .mf-val{color:var(--cyan)}.mf-box.green .mf-val{color:var(--green)}
   .mf-chg{font-size:17px;margin-top:2px}
@@ -92,7 +93,7 @@
   .btc-chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
   .bchip{border:1px solid var(--line2);border-radius:8px;padding:8px 6px;text-align:center;background:var(--bg3)}
   .bchip .k{font-size:14px;color:var(--muted)}
-  .bchip .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-bottom:3px}
+  .bchip .dot{width:18px;height:18px;border-radius:50%;display:inline-block;margin-bottom:5px}
   .bchip .vv{font-size:18px;font-weight:700;margin-top:2px}
   .verdict{text-align:center;font-size:21px;font-weight:800;padding:9px;border-radius:8px;border:1px solid var(--line);margin-bottom:10px}
   .ma-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -179,7 +180,7 @@ const SAMPLE_DATA = {
   btc: { price:64210.5, change24h:0.93, rsi:49.0, emaState:"혼합", priceState:"혼합", volState:"활발", verdict:"약한 강세",
          ma50:{side:"아래",pct:-11.3}, ma200:{side:"아래",pct:-16.6} },
   trend: { total:100, bull:57, bear:21, weakBull:84, rsiL3:97, rsiL5:88, rsiL8:75, up7d:{up:62,total:100},
-           series:(()=>{const a=[];for(let i=0;i<168;i++){a.push({bull:50+Math.round(Math.sin(i/12)*9+Math.sin(i/40)*6),weak:78+Math.round(Math.cos(i/15)*8),rsiL:80+Math.round(Math.sin(i/6)*15),total:100});}return a;})() },
+           series:(()=>{const a=[];for(let i=0;i<168;i++){a.push({bull:55+Math.round(Math.sin(i/12)*6),weak:82+Math.round(Math.cos(i/15)*6),rsiL3:80+Math.round(Math.sin(i/6)*16),rsiL5:62+Math.round(Math.sin(i/9)*14),rsiL8:48+Math.round(Math.cos(i/7)*12),total:100});}return a;})() },
   moneyflow: { ethbtc:{value:0.026920,change24h:-0.69,chart24h:[0.02713,0.02710,0.02707,0.02705,0.02709,0.02712,0.02708,0.02701,0.02698,0.02702,0.02699,0.02695,0.02697,0.02694,0.02696,0.02699,0.02697,0.02692,0.02689,0.02688,0.02690,0.02691,0.02692,0.02692]},
                usdtd:{value:8.2,change24h:-0.01} },
   history: (()=>{const a=[];const now=Date.now();for(let i=72;i>=0;i--){a.push({t:now-i*20*60e3,usdtd:8.2+Math.sin(i/9)*0.05,bull:55+Math.round(Math.sin(i/7)*6),weakBull:82+Math.round(Math.cos(i/8)*5),rsiL3:90+Math.round(Math.sin(i/5)*8)});}return a;})(),
@@ -276,7 +277,7 @@ function renderMarket(){
       <div class="market-row"><span class="chip">정배열 <b class="up">${br.long??"—"}</b> / 역배열 <b class="down">${br.short??"—"}</b> (${br.total??"—"})</span></div>
       <div class="breadth-bar"><div class="l" style="width:${lpct}%"></div><div class="s" style="width:${100-lpct}%"></div></div>
     </div>
-    <div class="mkt-desc">종합 신호 — BTC 추세·RSI + 시장 폭(정/역배열)을 합산한 점수 · <b class="up">+2 이상</b> 롱 · <b class="down">−2 이하</b> 숏 · 그 사이 무음</div>`;
+    <div class="mkt-desc">종합 신호 — BTC 추세·RSI + 시장 폭(정/역배열)을 합산한 점수<br><b class="up">+2 이상</b> 롱 · <b class="down">−2 이하</b> 숏 · 그 사이 무음</div>`;
 }
 
 /* ── ① 자금 흐름 ── */
@@ -290,13 +291,13 @@ function renderMoneyflow(){
     <div class="card-title">① 자금 흐름 — ETH/BTC · USDT.D <span class="tag">BINANCE · COINGECKO</span></div>
     <div class="mf-grid">
       <div class="mf-box cyan">
-        <div class="mf-name">ETH/BTC</div><div class="mf-sub">로테이션</div>
+        <div class="mf-head"><span class="mf-name">ETH/BTC</span><span class="mf-sub">로테이션</span></div>
         <div class="mf-val">${eb.value!=null?eb.value.toFixed(5):"—"}</div>
         <div class="mf-chg ${ebChg>=0?'up':'down'}">${fmtP(ebChg)} <span class="mut">(24h)</span></div>
         <div class="mf-spark">${eb.chart24h&&eb.chart24h.length?svgLine(eb.chart24h,{color:"#8be9fd"}):'<div class="chart-note">—</div>'}</div>
       </div>
       <div class="mf-box green">
-        <div class="mf-name">USDT.D</div><div class="mf-sub">현금화</div>
+        <div class="mf-head"><span class="mf-name">USDT.D</span><span class="mf-sub">현금화</span></div>
         <div class="mf-val">${ud.value!=null?ud.value.toFixed(1)+"%":"—"}</div>
         <div class="mf-chg ${udChg>=0?'up':'down'}">${fmtPP(udChg)} <span class="mut">(24h)</span></div>
         <div class="mf-spark">${udHist.length>=2?svgLine(udHist,{color:"#50fa7b"}):'<div class="chart-note">누적 중…</div>'}</div>
@@ -306,16 +307,20 @@ function renderMoneyflow(){
 }
 
 /* ── ② 추세 지표 (그래프 중심) ── */
-function svgTrend(series,win){
+function svgTrend(series,viewWin,tiltWin){
   if(!Array.isArray(series)||series.length<2) return `<div class="chart-note">추이 데이터가 아직 없습니다 (스캐너 실행 후 표시)</div>`;
-  const data=series.slice(-win), n=data.length;
+  const data=series.slice(-viewWin), n=data.length;
   const total=Math.max(...data.map(p=>p.total||0),1);
   const w=480,h=150,pl=2,pr=2,pt=6,pb=14,iw=w-pl-pr,ih=h-pt-pb;
   const X=i=>pl+(n>1?(i/(n-1))*iw:0), Y=v=>pt+ih-(v/total)*ih;
-  let grid="";[0.25,0.5,0.75].forEach(f=>{const y=(pt+ih-f*ih).toFixed(1);grid+=`<line x1="${pl}" y1="${y}" x2="${w-pr}" y2="${y}" stroke="#343746" stroke-width="1" stroke-dasharray="2 5"/>`;});
-  const lines=[{k:"rsiL",c:"#ffb86c"},{k:"weak",c:"#8be9fd"},{k:"bull",c:"#50fa7b"}];
-  let paths="";for(const ln of lines){let d="";data.forEach((p,i)=>{const v=p[ln.k];if(typeof v==="number")d+=(d?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)+" ";});paths+=`<path d="${d}" fill="none" stroke="${ln.c}" stroke-width="1.8"/>`;}
-  const lbl=win<=24?"24시간 전":win<=72?"3일 전":"7일 전";
+  // 25/75% 아주 흐리게, 50% 약한 점선으로 강조
+  let grid="";[0.25,0.75].forEach(f=>{const y=(pt+ih-f*ih).toFixed(1);grid+=`<line x1="${pl}" y1="${y}" x2="${w-pr}" y2="${y}" stroke="#2a2c3a" stroke-width="1" stroke-dasharray="2 6"/>`;});
+  const y50=(pt+ih-0.5*ih).toFixed(1);
+  grid+=`<line x1="${pl}" y1="${y50}" x2="${w-pr}" y2="${y50}" stroke="#6272a4" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>`;
+  const rk="rsiL"+(tiltWin||3);
+  const lines=[{k:rk,c:"#ffb86c"},{k:"weak",c:"#8be9fd"},{k:"bull",c:"#50fa7b"}];
+  let paths="";for(const ln of lines){let d="";data.forEach((p,i)=>{let v=p[ln.k];if(v==null&&ln.k.indexOf("rsiL")===0)v=p.rsiL;if(typeof v==="number")d+=(d?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)+" ";});paths+=`<path d="${d}" fill="none" stroke="${ln.c}" stroke-width="1.8"/>`;}
+  const lbl=viewWin<=24?"24시간 전":viewWin<=72?"3일 전":"7일 전";
   return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block" preserveAspectRatio="none">${grid}${paths}
     <text x="${pl+2}" y="${h-3}" fill="#6272a4" font-size="9">${lbl}</text>
     <text x="${w-pr-2}" y="${h-3}" fill="#6272a4" font-size="9" text-anchor="end">현재</text></svg>`;
@@ -331,7 +336,7 @@ function renderTrend(){
   el.innerHTML=`
     <div class="card-title">② 추세 지표 — 상위 ${tot} 종목 (1H)
       <span class="seg" id="twSeg"><button data-w="24" class="${tw===24?'on':''}">24H</button><button data-w="168" class="${tw===168?'on':''}">7D</button></span></div>
-    <div class="trend-chart">${svgTrend(t.series,tw)}</div>
+    <div class="trend-chart">${svgTrend(t.series,tw,win)}</div>
     <div class="legend" style="justify-content:center;margin:4px 0 12px">
       <span><i style="background:#ffb86c"></i>RSI-L (상승)</span>
       <span><i style="background:#8be9fd"></i>약정배</span>
