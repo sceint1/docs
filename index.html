@@ -11,29 +11,29 @@
   :root{
     --bg:#282a36; --bg2:#21222c; --bg3:#1b1c24;
     --line:#44475a; --line2:#343746;
-    --fg:#f8f8f2; --muted:#6272a4;
+    --fg:#f8f8f2; --muted:#8893c6;
     --cyan:#8be9fd; --green:#50fa7b; --orange:#ffb86c;
     --pink:#ff79c6; --purple:#bd93f9; --red:#ff5555; --yellow:#f1fa8c;
     --radius:10px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
-  body{background:var(--bg);color:var(--fg);font-family:"JetBrains Mono",ui-monospace,monospace;font-size:13px;line-height:1.45;padding:12px;padding-bottom:60px}
+  body{background:var(--bg);color:var(--fg);font-family:"JetBrains Mono",ui-monospace,monospace;font-size:20px;line-height:1.45;padding:12px;padding-bottom:60px}
   a{color:var(--cyan)}
 
   header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-  .logo{font-weight:800;font-size:15px;letter-spacing:.5px}
+  .logo{font-weight:800;font-size:23px;letter-spacing:.5px}
   .logo .dot{color:var(--green)}
-  .freshness{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
-  .pill{padding:3px 8px;border-radius:999px;border:1px solid var(--line);font-size:11px;font-weight:500;white-space:nowrap}
+  .freshness{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:17px;color:var(--muted)}
+  .pill{padding:3px 8px;border-radius:999px;border:1px solid var(--line);font-size:17px;font-weight:500;white-space:nowrap}
   .pill.ok{color:var(--green);border-color:#2c5a3a;background:#1e3326}
   .pill.stale{color:var(--orange);border-color:#5a4424;background:#33291a}
   .pill.demo{color:var(--purple);border-color:#43356b;background:#2a2342}
   .pill.err{color:var(--red);border-color:#5a2c2c;background:#331e1e}
 
   .card{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);padding:12px;margin-bottom:10px}
-  .card-title{font-size:11px;color:var(--cyan);font-weight:700;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-  .card-title .tag{margin-left:auto;font-size:10px;color:var(--muted);border:1px solid var(--line2);border-radius:6px;padding:2px 7px}
+  .card-title{font-size:22px;color:var(--cyan);font-weight:700;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .card-title .tag{margin-left:auto;font-size:15px;color:var(--muted);border:1px solid var(--line2);border-radius:6px;padding:2px 7px}
 
   /* score badge */
   .market{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
@@ -41,15 +41,16 @@
   .score-badge.bull{border-color:var(--green);background:#16301f;color:var(--green)}
   .score-badge.bear{border-color:var(--red);background:#311a1a;color:var(--red)}
   .score-badge.neutral{border-color:var(--muted);background:var(--bg3);color:var(--muted)}
-  .score-badge .num{font-size:30px;font-weight:800;line-height:1}
-  .score-badge .lbl{font-size:10px;margin-top:4px;letter-spacing:1px}
+  .score-badge .num{font-size:45px;font-weight:800;line-height:1}
+  .score-badge .lbl{font-size:15px;margin-top:4px;letter-spacing:1px}
   .market-meta{display:flex;flex-direction:column;gap:6px;min-width:0}
-  .market-row{display:flex;gap:8px;flex-wrap:wrap;font-size:11px}
+  .market-row{display:flex;gap:8px;flex-wrap:wrap;font-size:17px}
   .chip{padding:2px 8px;border-radius:6px;background:var(--bg3);border:1px solid var(--line2);color:var(--muted)}
   .chip b{color:var(--fg);font-weight:700}
   .chip .up{color:var(--green)} .chip .down{color:var(--red)}
   .breadth-bar{height:8px;border-radius:4px;overflow:hidden;display:flex;background:var(--bg3);border:1px solid var(--line2)}
   .breadth-bar .l{background:var(--green)} .breadth-bar .s{background:var(--red)}
+  .mkt-desc{font-size:15px;color:var(--muted);margin-top:7px;grid-column:1/-1;line-height:1.4}
 
   .up{color:var(--green)} .down{color:var(--red)} .mut{color:var(--muted)}
   .v-up{color:var(--green)} .v-dn{color:var(--red)} .v-mix{color:var(--orange)}
@@ -58,69 +59,69 @@
   .mf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .mf-box{border:1px solid var(--line);border-radius:8px;padding:10px;background:var(--bg3)}
   .mf-box.cyan{border-color:#2f6478}.mf-box.green{border-color:#2c5a3a}
-  .mf-name{font-size:10px;color:var(--muted)}
-  .mf-sub{font-size:9px;color:var(--muted);margin-bottom:4px}
-  .mf-val{font-size:22px;font-weight:800;letter-spacing:.5px}
+  .mf-name{font-size:15px;color:var(--muted)}
+  .mf-sub{font-size:14px;color:var(--muted);margin-bottom:4px}
+  .mf-val{font-size:33px;font-weight:800;letter-spacing:.5px}
   .mf-box.cyan .mf-val{color:var(--cyan)}.mf-box.green .mf-val{color:var(--green)}
-  .mf-chg{font-size:11px;margin-top:2px}
+  .mf-chg{font-size:17px;margin-top:2px}
   .mf-spark{margin-top:8px}
 
   /* ② 추세 */
   .tr-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
   .tr-stat{flex:1;min-width:64px;border:1px solid var(--line2);border-radius:8px;padding:8px;text-align:center;background:var(--bg3)}
-  .tr-stat .n{font-size:20px;font-weight:800;line-height:1}
-  .tr-stat .k{font-size:9px;color:var(--muted);margin-top:3px}
+  .tr-stat .n{font-size:30px;font-weight:800;line-height:1}
+  .tr-stat .k{font-size:14px;color:var(--muted);margin-top:3px}
   .tr-stat.rsil .n{color:var(--orange)} .tr-stat.weak .n{color:var(--cyan)} .tr-stat.bull .n{color:var(--green)} .tr-stat.bear .n{color:var(--red)}
-  .tr-sub{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:var(--muted);margin-bottom:8px}
+  .tr-sub{display:flex;gap:8px;flex-wrap:wrap;font-size:15px;color:var(--muted);margin-bottom:8px}
   .tr-sub b{color:var(--fg)}
   .seg{display:inline-flex;border:1px solid var(--line2);border-radius:7px;overflow:hidden;margin-left:auto}
-  .seg button{background:transparent;border:0;color:var(--muted);font-family:inherit;font-size:10px;padding:3px 9px;cursor:pointer}
+  .seg button{background:transparent;border:0;color:var(--muted);font-family:inherit;font-size:15px;padding:3px 9px;cursor:pointer}
   .seg button.on{background:var(--purple);color:#fff}
   .ratio-bar{height:7px;border-radius:4px;overflow:hidden;display:flex;background:var(--bg3);border:1px solid var(--line2);margin-bottom:8px}
   .ratio-bar .a{background:var(--orange)}
-  .chart-note{font-size:10px;color:var(--muted);text-align:center;padding:14px}
+  .chart-note{font-size:15px;color:var(--muted);text-align:center;padding:14px}
   .trend-chart{margin:2px 0;background:var(--bg3);border:1px solid var(--line2);border-radius:8px;padding:6px 4px 0}
-  .seg.sm button{padding:2px 6px;font-size:9px}
-  .legend{display:flex;gap:12px;font-size:10px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+  .seg.sm button{padding:2px 6px;font-size:14px}
+  .legend{display:flex;gap:12px;font-size:15px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
   .legend span{display:inline-flex;align-items:center;gap:4px}
   .legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
 
   /* ③ BTC */
   .btc-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-  .btc-price{font-size:24px;font-weight:800}
+  .btc-price{font-size:36px;font-weight:800}
   .btc-chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
   .bchip{border:1px solid var(--line2);border-radius:8px;padding:8px 6px;text-align:center;background:var(--bg3)}
-  .bchip .k{font-size:9px;color:var(--muted)}
+  .bchip .k{font-size:14px;color:var(--muted)}
   .bchip .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-bottom:3px}
-  .bchip .vv{font-size:12px;font-weight:700;margin-top:2px}
-  .verdict{text-align:center;font-size:14px;font-weight:800;padding:9px;border-radius:8px;border:1px solid var(--line);margin-bottom:10px}
+  .bchip .vv{font-size:18px;font-weight:700;margin-top:2px}
+  .verdict{text-align:center;font-size:21px;font-weight:800;padding:9px;border-radius:8px;border:1px solid var(--line);margin-bottom:10px}
   .ma-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .ma-box{border:1px solid var(--line2);border-radius:8px;padding:8px 10px;background:var(--bg3)}
-  .ma-box .k{font-size:9px;color:var(--muted)}
-  .ma-box .vv{font-size:14px;font-weight:700;margin-top:2px}
+  .ma-box .k{font-size:14px;color:var(--muted)}
+  .ma-box .vv{font-size:21px;font-weight:700;margin-top:2px}
 
   /* controls + table (기존) */
   details.panel{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);margin-bottom:10px;overflow:hidden}
-  details.panel>summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:700;font-size:12px;color:var(--cyan);display:flex;align-items:center;gap:8px;user-select:none}
+  details.panel>summary{list-style:none;cursor:pointer;padding:10px 12px;font-weight:700;font-size:18px;color:var(--cyan);display:flex;align-items:center;gap:8px;user-select:none}
   details.panel>summary::-webkit-details-marker{display:none}
   details.panel>summary::before{content:"▸";color:var(--muted);transition:.15s}
   details.panel[open]>summary::before{transform:rotate(90deg)}
   .panel-body{padding:0 12px 12px;display:flex;flex-wrap:wrap;gap:14px}
   .field{display:flex;flex-direction:column;gap:4px}
-  .field label{font-size:10px;color:var(--muted);letter-spacing:.5px}
-  .field input[type=number],.field input[type=text]{background:var(--bg3);border:1px solid var(--line);border-radius:6px;color:var(--fg);font-family:inherit;font-size:13px;padding:6px 8px;width:90px}
+  .field label{font-size:15px;color:var(--muted);letter-spacing:.5px}
+  .field input[type=number],.field input[type=text]{background:var(--bg3);border:1px solid var(--line);border-radius:6px;color:var(--fg);font-family:inherit;font-size:20px;padding:6px 8px;width:90px}
   .field input[type=text]{width:140px}
   .field input:focus{outline:none;border-color:var(--purple)}
-  .toggle{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;align-self:flex-end;padding-bottom:6px}
+  .toggle{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:18px;align-self:flex-end;padding-bottom:6px}
   .toggle input{accent-color:var(--purple);width:16px;height:16px}
 
   .table-wrap{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius);overflow:auto;-webkit-overflow-scrolling:touch}
-  table{border-collapse:collapse;width:100%;font-size:12px}
+  table{border-collapse:collapse;width:100%;font-size:18px}
   thead th{position:sticky;top:0;z-index:2;background:var(--bg3);color:var(--muted);font-weight:700;text-align:right;padding:9px 10px;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:1px solid var(--line)}
   thead th:first-child,tbody td:first-child{text-align:left;position:sticky;left:0;background:var(--bg3);z-index:1}
   tbody td:first-child{background:var(--bg2)}
-  thead th .arrow{color:var(--purple);font-size:10px;margin-left:3px}
-  thead th .ord{color:var(--muted);font-size:9px}
+  thead th .arrow{color:var(--purple);font-size:15px;margin-left:3px}
+  thead th .ord{color:var(--muted);font-size:14px}
   tbody td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line2);white-space:nowrap}
   tbody tr:hover td{background:#2f3142}
   tbody tr:hover td:first-child{background:#2f3142}
@@ -129,13 +130,13 @@
   .align-up{color:var(--green)} .align-down{color:var(--red)} .align-mix{color:var(--muted)}
   .near{color:var(--bg);background:var(--yellow);font-weight:700;border-radius:5px;padding:2px 6px}
   .empty{padding:30px;text-align:center;color:var(--muted)}
-  footer{margin-top:10px;font-size:10px;color:var(--muted);text-align:center}
+  footer{margin-top:10px;font-size:15px;color:var(--muted);text-align:center}
 
   @media(max-width:520px){
-    body{font-size:12px}
+    body{font-size:18px}
     .market{grid-template-columns:1fr}
     .score-badge{width:100%;height:64px;flex-direction:row;gap:10px}
-    .score-badge .num{font-size:26px}
+    .score-badge .num{font-size:39px}
     .btc-chips{grid-template-columns:repeat(2,1fr)}
     .field input[type=number]{width:72px}
   }
@@ -274,7 +275,8 @@ function renderMarket(){
         <span class="chip">BTC <b>${btc.align||"—"}</b> · RSI <b>${btc.rsi!=null?btc.rsi.toFixed(1):"—"}</b></span></div>
       <div class="market-row"><span class="chip">정배열 <b class="up">${br.long??"—"}</b> / 역배열 <b class="down">${br.short??"—"}</b> (${br.total??"—"})</span></div>
       <div class="breadth-bar"><div class="l" style="width:${lpct}%"></div><div class="s" style="width:${100-lpct}%"></div></div>
-    </div>`;
+    </div>
+    <div class="mkt-desc">종합 신호 — BTC 추세·RSI + 시장 폭(정/역배열)을 합산한 점수 · <b class="up">+2 이상</b> 롱 · <b class="down">−2 이하</b> 숏 · 그 사이 무음</div>`;
 }
 
 /* ── ① 자금 흐름 ── */
