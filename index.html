@@ -49,7 +49,7 @@
   .chip b{color:var(--fg);font-weight:700}
   .chip .up{color:var(--green)} .chip .down{color:var(--red)}
   .breadth-bar{height:8px;border-radius:4px;overflow:hidden;display:flex;background:var(--bg3);border:1px solid var(--line2)}
-  .breadth-bar .l{background:var(--green)} .breadth-bar .s{background:var(--red)}
+  .breadth-bar .l{background:var(--green)} .breadth-bar .n{background:#3a3d52} .breadth-bar .s{background:var(--red)}
   .mkt-desc{font-size:15px;color:var(--muted);margin-top:7px;grid-column:1/-1;line-height:1.4}
 
   .up{color:var(--green)} .down{color:var(--red)} .mut{color:var(--muted)}
@@ -268,14 +268,14 @@ function renderMarket(){
   const m=DATA.market||{},dir=m.direction||"neutral";
   const dirLabel=dir==="bull"?"롱 알림":dir==="bear"?"숏 알림":"중립 (무음)";
   const score=(m.score>0?"+":"")+(m.score??0),btc=m.btc||{},br=m.breadth||{};
-  const lpct=br.total?Math.round(br.long/br.total*100):50;
+  const _tot=br.total||1, lpct=Math.round((br.long||0)/_tot*100), spct=Math.round((br.short||0)/_tot*100), npct=Math.max(0,100-lpct-spct);
   document.getElementById("market").innerHTML=`
     <div class="score-badge ${dir}"><div class="num">${score}</div><div class="lbl">${dir.toUpperCase()}</div></div>
     <div class="market-meta">
       <div class="market-row"><span class="chip">방향 <b>${dirLabel}</b></span>
         <span class="chip">BTC <b>${btc.align||"—"}</b> · RSI <b>${btc.rsi!=null?btc.rsi.toFixed(1):"—"}</b></span></div>
       <div class="market-row"><span class="chip">정배열 <b class="up">${br.long??"—"}</b> / 역배열 <b class="down">${br.short??"—"}</b> (${br.total??"—"})</span></div>
-      <div class="breadth-bar"><div class="l" style="width:${lpct}%"></div><div class="s" style="width:${100-lpct}%"></div></div>
+      <div class="breadth-bar"><div class="l" style="width:${lpct}%"></div><div class="n" style="width:${npct}%"></div><div class="s" style="width:${spct}%"></div></div>
     </div>
     <div class="mkt-desc">종합 신호 — BTC 추세·RSI + 시장 폭(정/역배열)을 합산한 점수<br><b class="up">+2 이상</b> 롱 · <b class="down">−2 이하</b> 숏 · 그 사이 무음</div>`;
 }
