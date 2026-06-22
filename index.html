@@ -314,9 +314,9 @@ function svgTrend(series,viewWin,tiltWin){
   const w=480,h=150,pl=2,pr=2,pt=6,pb=14,iw=w-pl-pr,ih=h-pt-pb;
   const X=i=>pl+(n>1?(i/(n-1))*iw:0), Y=v=>pt+ih-(v/total)*ih;
   // 25/75% 아주 흐리게, 50% 약한 점선으로 강조
-  let grid="";[0.25,0.75].forEach(f=>{const y=(pt+ih-f*ih).toFixed(1);grid+=`<line x1="${pl}" y1="${y}" x2="${w-pr}" y2="${y}" stroke="#2a2c3a" stroke-width="1" stroke-dasharray="2 6"/>`;});
+  let grid="";[0.30,0.70].forEach(f=>{const y=(pt+ih-f*ih).toFixed(1);grid+=`<line x1="${pl}" y1="${y}" x2="${w-pr}" y2="${y}" stroke="#4c5168" stroke-width="1" stroke-dasharray="3 5" opacity="0.85"/>`;});
   const y50=(pt+ih-0.5*ih).toFixed(1);
-  grid+=`<line x1="${pl}" y1="${y50}" x2="${w-pr}" y2="${y50}" stroke="#6272a4" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>`;
+  grid+=`<line x1="${pl}" y1="${y50}" x2="${w-pr}" y2="${y50}" stroke="#6b78a6" stroke-width="1" stroke-dasharray="4 4" opacity="0.7"/>`;
   const rk="rsiL"+(tiltWin||3);
   const lines=[{k:rk,c:"#ffb86c"},{k:"weak",c:"#8be9fd"},{k:"bull",c:"#50fa7b"}];
   let paths="";for(const ln of lines){let d="";data.forEach((p,i)=>{let v=p[ln.k];if(v==null&&ln.k.indexOf("rsiL")===0)v=p.rsiL;if(typeof v==="number")d+=(d?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)+" ";});paths+=`<path d="${d}" fill="none" stroke="${ln.c}" stroke-width="1.8"/>`;}
